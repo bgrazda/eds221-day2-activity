@@ -1,0 +1,85 @@
+---
+execute: 
+  warning: false
+  echo: false
+title: "Wild Data"
+format: html
+editor: visual
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+#read in data
+
+mack_verts <- read_csv(here::here("data", "AS00601.csv"))
+#view(mack_verts)
+mack_verts <- mack_verts |> clean_names()
+```
+```{r}
+#trying out some indexing
+mc_wt_5 <- mack_verts$weight[5]
+mc_length_8_20 <- mack_verts$length1[8:20]
+mc_dates <- mack_verts$sampledate
+
+mc_salamanders <- mack_verts |> filter(species == "DITE")
+```
+
+```{r}
+salamander_size <- ggplot(mc_salamanders, 
+                          aes(x = length1, 
+                              y= weight)) +
+  geom_point(color = "forestgreen") +
+  labs(title = "Weight and Snout Length of Pacific Giant Salamanders",
+       x = "Length (mm)",
+       y = "Weight (g)",
+       subtitle = "Dicamptodon tenebrosus",
+       caption  = "Measuring the snout length and weight of the species Dicamptodon tenebrosus", ) +
+  theme_minimal() +
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5)) 
+  
+  
+  
+  
+salamander_size
+ggsave(here::here("figs", "salamander_size.png"))
+```
+```{r}
+
+mc_trout <- mack_verts |> filter(species == "ONCL")
+
+cutthroat_size <- ggplot(mc_trout, aes(x = length1,
+                                       y =weight,
+                                       color = reach)) +
+  geom_point() +
+  theme_classic() +
+  scale_color_manual(values = c("hotpink", "purple", "blue")) +
+  facet_wrap(~reach) +
+  labs(title = "Weight of Trout Species of Varying Lengths ",
+       x = "Length (mm)",
+       y = "Weight (g)",
+       legend = "Reach",
+       subtitle = "Oncorhyncus clarkii clarkii",
+       caption = "Collected vertebrate samples from 1987 to 2019 at Lower (0-50m), Middle (50-100m), and Upper Reach (100-150m).") + 
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5)) 
+  
+
+cutthroat_size
+ggsave(here::here("figs", "cutthroat_size.png"))
+```
+
+
+
+
+
+
+
+
